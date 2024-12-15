@@ -97,7 +97,6 @@ public:
     void cancelOrder(const CancelOrder& cancel) 
     {
         // Lock the mutex for the concurrent process
-
         // Find the orderId in placeOrder structure , 
         // If if matches , then print the the  cancelled message , erase from for the PlaceOrdered.
     }
