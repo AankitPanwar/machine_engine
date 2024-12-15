@@ -88,24 +88,6 @@ public:
             sellOrders.push_back(order);
             sortSellOrders();
         }
-
-/*    std::cout << "************* BUYER ****************" << std::endl;
-    for(auto buy_value : buyOrders)
-    {
-                std::cout << "Buyer OrderID = " << buy_value.orderId  << std::endl;
-                std::cout << "Buyer Price   = " << buy_value.price << std::endl;
-                std::cout << "Buyer Amount  = " << buy_value.amount << std::endl;
-        std::cout << "*****************************" << std::endl;
-    }
-    std::cout <<std::endl;
-
-    for(auto buy_value : sellOrders)
-    {
-                std::cout << "Seller OrderID = " << buy_value.orderId  << std::endl;
-                std::cout << "Seller Price   = " << buy_value.price << std::endl;
-                std::cout << "Seller Amount  = " << buy_value.amount << std::endl;
-        std::cout << "*****************************" << std::endl;
-    }*/
       std::cout <<std::endl;
 
         matchOrders();
@@ -115,27 +97,8 @@ public:
     void cancelOrder(const CancelOrder& cancel) 
     {
         // Lock the mutex for the concurrent process
-
         // Find the orderId in placeOrder structure , 
         // If if matches , then print the the  cancelled message , erase from for the PlaceOrdered.
-        std::lock_guard<std::mutex> lock(engineMutex);
-
-        auto removeOrder = [&](std::vector<PlaceOrder>& orders) {
-            auto it = std::remove_if(orders.begin(), orders.end(), [&](const PlaceOrder& order) {
-                return order.orderId == cancel.orderId;
-            });
-
-            if (it != orders.end()) {
-                orders.erase(it, orders.end());
-                std::cout << "Order " << cancel.orderId << " canceled." << std::endl;
-                return true;
-            }
-            return false;
-        };
-
-        if (!removeOrder(buyOrders) && !removeOrder(sellOrders)) {
-            std::cout << "Order " << cancel.orderId << " not found." << std::endl;
-        }
     }
 };
 
@@ -158,12 +121,13 @@ void clientFunction(MatchingEngine& engine, int clientId)
 }
 
 int main() {
-    MatchingEngine engine;
 
+    MatchingEngine engine;
     // Start test clients in separate threads
     std::thread sellerThread(clientFunction, std::ref(engine), 1);
     std::thread buyerThread(clientFunction,  std::ref(engine), 2);
 
+    // wait for threads to complete
     sellerThread.join();
     buyerThread.join();
 
